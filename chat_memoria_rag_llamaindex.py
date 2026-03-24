@@ -58,12 +58,23 @@ while True:
     # 🔹 Construção da pergunta com memória
     # As últimas interações são concatenadas à pergunta atual
     # para dar contexto ao LLM (memória conversacional básica)
-    if chat_history:
-        history_context = "\n".join(chat_history[-4:])  # últimas interações
-        query = f"CONVERSA ANTERIOR:\n{history_context}\n\nPERGUNTA:\n{user_input}"
-    else:
-        query = user_input
+    history_context = "\n".join(chat_history[-4:])
 
+    query = f"""
+    Você é um assistente que prioriza responder com base nos documentos fornecidos.
+
+    Regras:
+    - Use os documentos como principal fonte de verdade
+    - Se a informação não estiver explícita, diga que não encontrou no conteúdo
+    - Evite inventar informações
+    - Seja claro e amigável
+
+    CONVERSA ANTERIOR:
+    {history_context}
+
+    PERGUNTA:
+    {user_input}
+    """
     # 🔹 Executa a consulta RAG
     response = query_engine.query(query)
 

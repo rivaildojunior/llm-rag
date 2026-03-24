@@ -1,0 +1,152 @@
+Arquivo de exemplo para testes de RAG.
+
+Este documento contém informações fictícias sobre políticas de um e-commerce, criado exclusivamente para fins de estudo e experimentação com modelos de linguagem.
+
+Empresa: NovaShop
+Segmento: E-commerce de eletrônicos, acessórios e itens para casa
+Fundação: 2022
+
+---
+
+[TÍTULO: Prazo para devolução por arrependimento]
+
+O cliente pode solicitar a devolução de um produto em até 7 dias corridos após o recebimento, conforme o Código de Defesa do Consumidor.
+
+---
+
+[TÍTULO: Condições para devolução]
+
+Para que a devolução seja aceita, o produto deve:
+- Estar sem sinais de uso
+- Estar na embalagem original
+- Conter todos os acessórios e manuais
+
+---
+
+[TÍTULO: Como solicitar troca ou devolução]
+
+Para solicitar uma troca ou devolução, o cliente deve:
+1. Acessar a área "Meus Pedidos"
+2. Selecionar o pedido desejado
+3. Escolher a opção "Solicitar troca ou devolução"
+4. Informar o motivo
+
+O prazo de análise da solicitação é de até 3 dias úteis.
+
+---
+
+[TÍTULO: Reembolso para cartão de crédito]
+
+Para pagamentos realizados com cartão de crédito:
+- O estorno será feito na fatura
+- O prazo pode variar de 1 a 2 ciclos de cobrança
+
+---
+
+[TÍTULO: Reembolso para boleto ou PIX]
+
+Para pagamentos realizados via boleto bancário ou PIX:
+- O reembolso será feito por transferência bancária
+- O prazo é de até 10 dias úteis após a aprovação da devolução
+
+---
+
+[TÍTULO: Opções para produto com defeito]
+
+Caso o produto apresente defeito, o cliente pode escolher entre:
+- Reembolso integral
+- Troca por outro produto igual
+- Crédito para compras futuras na loja
+
+---
+
+[TÍTULO: Prazo para reclamação de produto com defeito]
+
+O prazo para reclamar de produtos com defeito é:
+- 30 dias para produtos não duráveis
+- 90 dias para produtos duráveis
+
+---
+
+[TÍTULO: Processo para análise de defeito]
+
+A loja poderá solicitar o envio do produto para análise técnica antes de aprovar:
+- Troca
+- Reembolso
+- Crédito
+
+---
+
+[TÍTULO: Cancelamento de pedidos antes do envio]
+
+O cliente pode cancelar o pedido sem custo antes do envio.
+
+---
+
+[TÍTULO: Cancelamento de pedidos após envio]
+
+Se o pedido já tiver sido enviado:
+- O cliente deve aguardar a entrega
+- Depois, deve solicitar a devolução em até 7 dias corridos
+
+---
+
+[TÍTULO: Política de frete]
+
+- Frete grátis para compras acima de R$ 299,00 (regiões selecionadas)
+- O valor do frete é calculado no checkout
+
+---
+
+[TÍTULO: Frete em caso de devolução por arrependimento]
+
+Em casos de devolução por arrependimento:
+- O custo do frete pode ser de responsabilidade do cliente
+
+---
+
+[TÍTULO: Prazos de entrega]
+
+O prazo de entrega varia conforme:
+- Região
+- Tipo de frete escolhido
+
+O prazo estimado é informado no momento da compra.
+
+---
+
+[TÍTULO: Possíveis causas de atraso na entrega]
+
+Atrasos podem ocorrer devido a:
+- Endereço incorreto ou incompleto
+- Ausência do destinatário
+- Greves ou condições climáticas
+
+---
+
+[TÍTULO: Atendimento ao cliente]
+
+Canais de atendimento:
+- Chat online
+- E-mail: suporte@novashop.com
+- WhatsApp: (11) 99999-9999
+
+Horário de atendimento:
+- Segunda a sexta, das 9h às 18h
+
+Prazo médio de resposta:
+- Até 24 horas úteis
+
+---
+
+[TÍTULO: Segurança e privacidade]
+
+A loja utiliza criptografia para proteger os dados dos clientes.
+
+As informações:
+- Não são compartilhadas com terceiros
+- São usadas apenas para processamento de pedidos
+
+---
+
+Este texto não representa uma empresa real e pode ser modificado livremente para simular diferentes cenários de consulta em sistemas de RAG.
