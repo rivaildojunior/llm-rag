@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex, Document, Settings
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.core.node_parser import SimpleNodeParser
 import time  
 
 # Carrega variáveis de ambiente (ex: OPENAI_API_KEY)
@@ -19,20 +20,17 @@ Settings.embed_model = OpenAIEmbedding()
 with open("dados.txt", "r", encoding="utf-8") as f:
     content = f.read()
 
-# 🔹 Transformação do texto em documentos
-# Cada parágrafo vira um Document, que é a unidade básica do LlamaIndex
-documents = [
-    Document(text=chunk.strip())
-    for chunk in content.split("\n\n")
-    if chunk.strip()
-]
+# 🔹 Configuração de chunking
+node_parser = SimpleNodeParser.from_defaults(
+    chunk_size=500,      # tamanho do chunk (tokens aproximados)
+    chunk_overlap=100    # overlap entre chunks
+)
 
-# 🔹 Criação do índice vetorial
-# Aqui o LlamaIndex:
-# - gera embeddings dos documentos
-# - armazena os vetores
-# - prepara a base para recuperação semântica (RAG)
-index = VectorStoreIndex.from_documents(documents)
+documents = [Document(text=content)]
+
+nodes = node_parser.get_nodes_from_documents(documents)
+
+index = VectorStoreIndex(nodes)
 
 # 🔹 Query engine
 # Responsável por:
