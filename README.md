@@ -10,35 +10,25 @@ Por fim, os trechos encontrados são enviados junto com a pergunta para o modelo
 ## Arquitetura
 
 ```mermaid
-graph TB
-    subgraph Ingestao [Processo de Ingestão]
-        direction LR
-        A[Base de Conhecimento] --> B{Chunks}
-        B --> C[Embeddings]
-        C --> D[(Índice Vetorial)]
-    end
+graph LR
+    %% Nós principais
+    A[Base de Dados] --> B(Embeddings)
+    B --> C[(Vetor DB)]
+    
+    D[Pergunta] --> E(Embedding)
+    E --> F{Busca}
+    
+    C <--> F
+    F --> G[Contexto]
+    G --> H[LLM]
+    H --> I((Resposta))
 
-    subgraph Consulta [Processo de Query]
-        direction LR
-        E[Pergunta Usuário] --> F[Embedding]
-        F --> G[Busca Semântica]
-        G <--> D
-        G --> H[Contexto]
-    end
-
-    subgraph Geracao [Resposta]
-        direction LR
-        H --> I[LLM]
-        I --> J((Resposta Final))
-    end
-
-    %% Estilização para ficar visual e colorido
-    style Ingestao fill:#f1f5f9,stroke:#334155,stroke-width:2px
-    style Consulta fill:#ecfdf5,stroke:#059669,stroke-width:2px
-    style Geracao fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-    style D fill:#fef3c7,stroke:#d97706,stroke-width:2px
-    style J fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    %% Estilização simples e elegante
+    style C fill:#fef3c7,stroke:#d97706,stroke-width:2px
+    style I fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    style F fill:#eff6ff,stroke:#2563eb,stroke-width:2px
 ```
+
 ## Como Executar
 1. Instale as dependências necessárias:
    ```
