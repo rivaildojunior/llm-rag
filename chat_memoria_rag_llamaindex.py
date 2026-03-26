@@ -7,6 +7,8 @@ import time
 
 load_dotenv()
 
+MAX_HISTORY_CHARS = 2000
+
 Settings.llm = OpenAI(model="gpt-5", temperature=0.1)
 
 Settings.embed_model = OpenAIEmbedding()
@@ -38,6 +40,20 @@ chat_history = []
 
 print("🤖 Chat iniciado com RAG + memória simples (LlamaIndex + OpenAI).\n")
 
+def trim_chat_history(chat_history, max_chars):
+    total = 0
+    trimmed = []
+
+    # percorre de trás pra frente (mensagens mais recentes primeiro)
+    for msg in reversed(chat_history):
+        msg_len = len(msg["content"])
+        if total + msg_len > max_chars:
+            break
+        trimmed.append(msg)
+        total += msg_len
+
+    return list(reversed(trimmed))
+
 while True:
     user_input = input("Você: ")
 
@@ -47,9 +63,11 @@ while True:
 
     # As últimas interações são concatenadas à pergunta atual
     # para dar contexto ao LLM (memória conversacional básica)
+    trimmed_history = trim_chat_history(chat_history, MAX_HISTORY_CHARS)
+
     history_context = "\n".join(
-        [f"{msg['role']}: {msg['content']}" for msg in chat_history[-4:]]
-    )      
+        [f"{msg['role']}: {msg['content']}" for msg in trimmed_history]
+    )     
 
     query = f"""
     Você é um assistente que prioriza responder com base nos documentos fornecidos.
