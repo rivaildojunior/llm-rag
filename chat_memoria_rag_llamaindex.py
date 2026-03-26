@@ -47,7 +47,9 @@ while True:
 
     # As últimas interações são concatenadas à pergunta atual
     # para dar contexto ao LLM (memória conversacional básica)
-    history_context = "\n".join(chat_history[-4:])
+    history_context = "\n".join(
+        [f"{msg['role']}: {msg['content']}" for msg in chat_history[-4:]]
+    )      
 
     query = f"""
     Você é um assistente que prioriza responder com base nos documentos fornecidos.
@@ -81,5 +83,5 @@ while True:
 
 
     # Atualiza a memória da conversa
-    chat_history.append(f"Usuário: {user_input}")
-    chat_history.append(f"Assistente: {answer}")
+    chat_history.append({"role": "user", "content": user_input})
+    chat_history.append({"role": "assistant", "content": answer})
