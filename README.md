@@ -22,6 +22,11 @@ Streamlit é um framework para criar aplicações web em Python de forma rápida
 
 A vantagem do Streamlit é que ele abstrai HTML/CSS/JS e permite renderizar componentes interativos diretamente de scripts Python. Isso reduz radicalmente o tempo de desenvolvimento, ideal para POCs e demos como esta.
 
+## Guardrails
+Guardrails são mecanismos de segurança e controle que validam inputs do usuário e outputs do modelo para evitar comportamentos indesejados, como jailbreaks, vazamento de dados, alucinações ou respostas prejudiciais. Na nossa POC de RAG, adicionamos guardrails implementando camadas de proteção em três pontos críticos: (1) validação de entrada - filtramos perguntas maliciosas, tópicos sensíveis ou prompts de injeção antes de enviar ao RAG; (2) validação de contexto - verificamos se a resposta gerada está realmente fundamentada nos documentos recuperados, evitando que o modelo fabrique informações; (3) validação de saída - bloqueamos respostas que contenham tokens de conteúdo sensível ou que saiam do escopo definido.
+
+A implementação está em `guardrails_service.py`, com métodos simples e extensíveis que podem ser adaptados conforme o projeto evolui.
+
 ## Arquitetura
 
 ```mermaid

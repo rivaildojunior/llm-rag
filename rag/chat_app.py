@@ -1,12 +1,14 @@
 import time
 from rag.rag_service import RagService
 from rag.memory_service import MemoryService
+from rag.guardrails_service import GuardrailsService
 
 
 class ChatApp:
     def __init__(self):
         self.rag = RagService()
         self.memory = MemoryService()
+        self.guardrails = GuardrailsService()
 
     def run(self):
         print("🤖 Chat iniciado com RAG + memória simples (LlamaIndex + OpenAI).\n")
@@ -17,6 +19,12 @@ class ChatApp:
             if user_input.lower() in ["sair", "exit", "quit"]:
                 print("👋 Encerrando o chat.")
                 break
+
+            # Validar input
+            is_valid, error_msg = self.guardrails.validate_input(user_input)
+            if not is_valid:
+                print(f"🤖 Assistente: {error_msg}\n")
+                continue
 
             history_context = self.memory.get_context()
 
@@ -38,10 +46,13 @@ class ChatApp:
 
             response = self.rag.query(query)
 
-            if response.source_nodes:
+            # Validar resposta
+            is_response_valid, warning_msg = self.guardrails.validate_response(response)
+            
+            if response.source_nodes and is_response_valid:
                 answer = response.response
             else:
-                answer = "Não sei."
+                answer = warning_msg if warning_msg else "Não sei."
 
             print("🤖 Assistente: ", end="")
             for char in answer:

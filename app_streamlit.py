@@ -3,6 +3,7 @@ import time
 from dotenv import load_dotenv
 from rag.rag_service import RagService
 from rag.memory_service import MemoryService
+from rag.guardrails_service import GuardrailsService
 
 load_dotenv()
 
@@ -39,6 +40,7 @@ st.markdown("""
 if "rag_service" not in st.session_state:
     st.session_state.rag_service = RagService()
     st.session_state.memory = MemoryService()
+    st.session_state.guardrails = GuardrailsService()
     st.session_state.last_processed_input = None
     st.session_state.last_animated_message_count = 0
     st.session_state.submit_count = 0
@@ -92,8 +94,12 @@ with col2:
     submit_button = st.button("📤 Enviar", use_container_width=True)
 
 if submit_button and user_input:
+    # Validar input
+    is_valid, error_msg = st.session_state.guardrails.validate_input(user_input)
+    if not is_valid:
+        st.error(error_msg)
     # Verificar se a pergunta já foi processada (evita loop)
-    if user_input != st.session_state.last_processed_input:
+    elif user_input != st.session_state.last_processed_input:
         st.session_state.last_processed_input = user_input
         
         # Adicionar mensagem do usuário ao histórico
@@ -122,7 +128,14 @@ if submit_button and user_input:
         # Mostrar spinner enquanto processa
         with st.spinner("🔄 Processando sua pergunta..."):
             response = st.session_state.rag_service.query(query)
-            answer = response.response if response.source_nodes else "Desculpe, não encontrei informações sobre isso no conteúdo disponível."
+            
+            # Validar resposta
+            is_response_valid, warning_msg = st.session_state.guardrails.validate_response(response)
+            
+            if response.source_nodes and is_response_valid:
+                answer = response.response
+            else:
+                answer = warning_msg if warning_msg else "Desculpe, não encontrei informações sobre isso no conteúdo disponível."
         
         # Adicionar resposta ao histórico
         st.session_state.memory.add("assistant", answer)
