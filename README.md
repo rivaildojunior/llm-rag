@@ -25,7 +25,10 @@ A vantagem do Streamlit é que ele abstrai HTML/CSS/JS e permite renderizar comp
 ## Guardrails
 Guardrails são mecanismos de segurança e controle que validam inputs do usuário e outputs do modelo para evitar comportamentos indesejados, como jailbreaks, vazamento de dados, alucinações ou respostas prejudiciais. Na nossa POC de RAG, adicionamos guardrails implementando camadas de proteção em três pontos críticos: (1) validação de entrada - filtramos perguntas maliciosas, tópicos sensíveis ou prompts de injeção antes de enviar ao RAG; (2) validação de contexto - verificamos se a resposta gerada está realmente fundamentada nos documentos recuperados, evitando que o modelo fabrique informações; (3) validação de saída - bloqueamos respostas que contenham tokens de conteúdo sensível ou que saiam do escopo definido.
 
-A implementação está em `guardrails_service.py`, com métodos simples e extensíveis que podem ser adaptados conforme o projeto evolui.
+## Re-ranking
+Re-ranking é uma técnica de segunda etapa que melhora a qualidade dos resultados de busca. Após a busca inicial por similaridade de embeddings (que retorna os top 10 chunks), usamos um cross-encoder (`sentence-transformers`) para reavaliar e reordenar esses resultados baseado em relevância contextual mais precisa. Isso reduz falsos positivos e garante que apenas os 3 chunks mais relevantes sejam enviados para o LLM, melhorando significativamente a qualidade das respostas.
+
+A implementação está em `rag_service.py` e usa o modelo leve `cross-encoder/ms-marco-MiniLM-L-6-v2` para manter a simplicidade e performance.
 
 ## Arquitetura
 
@@ -53,13 +56,28 @@ O diagrama reflete o fluxo de uma arquitetura RAG típica: o conteúdo de `dados
 
 ## Como Executar
 
-### Instalação das Dependências
+### Configuração do Ambiente Virtual
+
+1. **Criar ambiente virtual:**
 ```bash
-pip install llama-index openai python-dotenv streamlit
+python3 -m venv venv
+```
+
+2. **Ativar ambiente virtual:**
+```bash
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate     # Windows
+```
+
+3. **Instalar dependências:**
+```bash
+pip install -r requirements.txt
 ```
 
 ### Configuração da API Key
-Crie um arquivo `.env` na raiz do projeto com sua chave da API do OpenAI:
+1. Copie o arquivo de exemplo: `cp .env.example .env`
+2. Edite o arquivo `.env` com sua chave da API do OpenAI:
 ```
 OPENAI_API_KEY=sua_chave_aqui
 ```
@@ -75,3 +93,16 @@ streamlit run app_streamlit.py
 ```
 
 O navegador abrirá automaticamente em `http://localhost:8501` com uma interface amigável para interagir com o chatbot.
+
+### Troubleshooting
+
+**Erro "ModuleNotFoundError":**
+- Certifique-se de que o ambiente virtual está ativado: `source venv/bin/activate`
+- Reinstale as dependências: `pip install -r requirements.txt`
+
+**Erro de API Key:**
+- Verifique se o arquivo `.env` existe na raiz do projeto
+- Confirme que a chave da OpenAI está correta: `OPENAI_API_KEY=sk-...`
+
+**Problemas com o modelo "gpt-5":**
+- O modelo pode não existir. Tente alterar para `gpt-4` ou `gpt-3.5-turbo` no arquivo `rag/rag_service.py`

@@ -2,9 +2,11 @@ from llama_index.core import VectorStoreIndex, Document, Settings
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SimpleNodeParser
+from sentence_transformers import CrossEncoder
 
 
 class RagService:
+    
     def __init__(self):
         # Configuração do LLM (OpenAI) para geração de texto.
         # Na POC estamos usando o modelo "gpt-5" com temperatura baixa para respostas mais consistentes.
@@ -34,9 +36,37 @@ class RagService:
         index = VectorStoreIndex(nodes)
 
         # Cria o mecanismo de consulta (query engine) usando similaridade para retornar hits relevantes.
-        # similarity_top_k=6 indica os 6 documentos mais similares para cada consulta.
-        self.query_engine = index.as_query_engine(similarity_top_k=6)
+        # similarity_top_k=10 indica os 10 documentos mais similares para cada consulta (antes do re-ranking).
+        self.query_engine = index.as_query_engine(similarity_top_k=10)
+        
+        # Inicializa o cross-encoder para re-ranking
+        self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
 
     def query(self, query: str):
-        # Executa a consulta no mecanismo de RAG e retorna o resultado.
-        return self.query_engine.query(query)
+        # Executa a consulta inicial no mecanismo de RAG
+        initial_response = self.query_engine.query(query)
+        
+        # Se não há source_nodes, retorna resposta vazia
+        if not initial_response.source_nodes:
+            return initial_response
+        
+        # Extrai textos dos nodes para re-ranking
+        node_texts = [node.text for node in initial_response.source_nodes]
+        
+        # Cria pares (query, text) para o cross-encoder
+        query_text_pairs = [[query, text] for text in node_texts]
+        
+        # Calcula scores de relevância com cross-encoder
+        scores = self.cross_encoder.predict(query_text_pairs)
+        
+        # Ordena nodes por score (decrescente)
+        scored_nodes = list(zip(scores, initial_response.source_nodes))
+        scored_nodes.sort(key=lambda x: x[0], reverse=True)
+        
+        # Seleciona apenas os top 3 mais relevantes após re-ranking
+        top_nodes = [node for score, node in scored_nodes[:3]]
+        
+        # Atualiza a resposta com os nodes re-rankados
+        initial_response.source_nodes = top_nodes
+        
+        return initial_response
