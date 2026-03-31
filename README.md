@@ -37,22 +37,38 @@ graph LR
     %% Nós principais
     A[Base de Dados] --> B(Embeddings)
     B --> C[(Vetor DB)]
-    
-    D[Pergunta] --> E(Embedding)
-    E --> F{Busca}
-    
-    C <--> F
-    F --> G[Contexto]
-    G --> H[LLM]
-    H --> I((Resposta))
+
+    D[Pergunta] --> E[Input Guardrail]
+    E --> F[Embedding]
+    F --> G{Busca}
+
+    C <--> G
+    G --> H[Re-ranking]
+    H --> I[Contexto]
+    I --> J[LLM]
+    J --> K[Output Guardrail]
+    K --> L((Resposta))
 
     %% Estilização simples e elegante
     style C fill:#fef3c7,stroke:#d97706,stroke-width:2px
-    style I fill:#dcfce7,stroke:#16a34a,stroke-width:2px
-    style F fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style L fill:#dcfce7,stroke:#16a34a,stroke-width:2px
+    style G fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style H fill:#dbeafe,stroke:#2563eb,stroke-width:2px
+    style E fill:#fde68a,stroke:#d97706,stroke-width:2px
+    style K fill:#fde68a,stroke:#d97706,stroke-width:2px
 ```
 
-O diagrama reflete o fluxo de uma arquitetura RAG típica: o conteúdo de `dados.txt` é convertido em embeddings e indexado no `Vetor DB`; a pergunta do usuário também é convertida em embedding, usada para recuperar os trechos mais relevantes, e esse contexto é passado para o LLM, que gera a resposta final. Isso garante que a LLM responda com base em dados reais (não apenas em geração livre) e mantém o ciclo de interação rápido e transparente.
+O diagrama reflete o fluxo atualizado da arquitetura RAG com guardrails e re-ranking:
+
+- `Base de Dados` → `Embeddings` → `Vetor DB`
+- `Pergunta` passa por `Input Guardrail` (validações de entrada)
+- Conversão de pergunta para embedding e busca semântica no vetor
+- resultados de busca são reordenados em `Re-ranking`
+- `Contexto` entra no `LLM`
+- saída do modelo passa por `Output Guardrail` (validações de contexto e saída)
+- `Resposta` final é retornada ao usuário
+
+Essa atualização torna explícito o pipeline de segurança e qualidade que você implementou: filtragem antes e depois do LLM, e reavaliação dos chunks retornados para reduzir falsos positivos e alucinações.
 
 ## Como Executar
 
