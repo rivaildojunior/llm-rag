@@ -1,11 +1,5 @@
 # POC LLM + RAG
 
-## Instalação e Execução
-1. Instale as dependências: `pip install -r requirements.txt`
-2. Configure o Qdrant: `docker run -p 6333:6333 qdrant/qdrant` (para persistência do índice)
-3. Configure variáveis de ambiente: crie um `.env` com `OPENAI_API_KEY=your_key`
-4. Execute o chat: `python main.py` ou a interface web: `streamlit run app_streamlit.py`
-
 ## Como Funciona o RAG
 No RAG, tudo começa com a leitura da sua base de conhecimento (ex: dados.txt). Esse conteúdo é dividido em pedaços menores (chunks), para facilitar o processamento. Em seguida, cada pedaço é transformado em um vetor numérico usando embeddings — basicamente, o texto vira uma representação matemática que captura o significado dele.
 
@@ -14,22 +8,13 @@ Esses vetores são armazenados em um índice vetorial. Quando o usuário faz uma
 Por fim, os trechos encontrados são enviados junto com a pergunta para o modelo de linguagem. A LLM usa esse contexto como base para gerar a resposta, evitando “inventar” informações e respondendo com base no conteúdo recuperado.
 
 ## LlamaIndex
-LlamaIndex é uma biblioteca que facilita a criação de pipelines RAG completos. Na POC, usamos `VectorStoreIndex` para indexar documentos com embeddings e `index.as_query_engine()` para fazer buscas semânticas com alto desempenho.
+LlamaIndex é uma biblioteca que facilita a criação de pipelines RAG completos. Na POC, usamos `VectorStoreIndex` com `QdrantVectorStore` para indexar documentos com embeddings e `index.as_query_engine()` para fazer buscas semânticas com alto desempenho.
 
-O objetivo do LlamaIndex é reduzir o código boilerplate de ingestão, parsing e recuperação, deixando você focar na lógica de negócio. Ele suporta vários backends de vetor, configurações de chunking de texto e mantém a coerência entre consultas e documentos.
+O objetivo do LlamaIndex é reduzir o código boilerplate de ingestão, parsing e recuperação, deixando você focar na lógica de negócio. Ele suporta vários backends de vetor (Qdrant, Pinecone, Weaviate, ChromaDB), configurações de chunking de texto e mantém a coerência entre consultas e documentos.
 
-## OpenAI
-OpenAI fornece o modelo de linguagem (`gpt-5`) e embeddings usados no projeto. Em `rag_service.py`, `Settings.llm = OpenAI(model="gpt-5", temperature=0.1)` e `Settings.embed_model = OpenAIEmbedding()`.
-
-Esses modelos são consumidos pela aplicação para gerar as respostas e para converter texto em vetores num espaço semântico. Garante-se assim que o RAG consiga comparar com precisão a similaridade entre perguntas e trechos de texto.
-
-## Streamlit
-Streamlit é um framework para criar aplicações web em Python de forma rápida. Aqui, `app_streamlit.py` fornece interface visual, histórico de chat e botão de envio, enquanto `main.py` mantém o fluxo de terminal.
-
-A vantagem do Streamlit é que ele abstrai HTML/CSS/JS e permite renderizar componentes interativos diretamente de scripts Python. Isso reduz radicalmente o tempo de desenvolvimento, ideal para POCs e demos como esta.
 
 ## Guardrails
-Guardrails são mecanismos de segurança e controle que validam inputs do usuário e outputs do modelo para evitar comportamentos indesejados, como jailbreaks, vazamento de dados, alucinações ou respostas prejudiciais. Na nossa POC de RAG, adicionamos guardrails implementando camadas de proteção em três pontos críticos: (1) validação de entrada - filtramos perguntas maliciosas, tópicos sensíveis ou prompts de injeção antes de enviar ao RAG; (2) validação de contexto - verificamos se a resposta gerada está realmente fundamentada nos documentos recuperados, evitando que o modelo fabrique informações; (3) validação de saída - bloqueamos respostas que contenham tokens de conteúdo sensível ou que saiam do escopo definido.
+Guardrails são mecanismos de segurança e controle que validam inputs do usuário e outputs do modelo para evitar comportamentos indesejados, como jailbreaks, vazamento de dados, alucinações ou respostas prejudiciais. Na POC, adicionamos guardrails implementando camadas de proteção em três pontos críticos: (1) validação de entrada - filtramos perguntas maliciosas, tópicos sensíveis ou prompts de injeção antes de enviar ao RAG; (2) validação de contexto - verificamos se a resposta gerada está realmente fundamentada nos documentos recuperados, evitando que o modelo fabrique informações; (3) validação de saída - bloqueamos respostas que contenham tokens de conteúdo sensível ou que saiam do escopo definido.
 
 ## Re-ranking
 Re-ranking é uma técnica de segunda etapa que melhora a qualidade dos resultados de busca. Após a busca inicial por similaridade de embeddings (que retorna os top 10 chunks), usamos um cross-encoder (`sentence-transformers`) para reavaliar e reordenar esses resultados baseado em relevância contextual mais precisa. Isso reduz falsos positivos e garante que apenas os 3 chunks mais relevantes sejam enviados para o LLM, melhorando significativamente a qualidade das respostas.
@@ -42,6 +27,16 @@ Qdrant é um banco de dados vetorial usado para armazenar e recuperar embeddings
 Para rodar: `docker run -p 6333:6333 qdrant/qdrant`
 
 O índice é salvo automaticamente na coleção "rag_collection" no Qdrant.
+
+## OpenAI
+OpenAI fornece o modelo de linguagem (`gpt-5`) e embeddings usados no projeto. Em `rag_service.py`, `Settings.llm = OpenAI(model="gpt-5", temperature=0.1)` e `Settings.embed_model = OpenAIEmbedding()`.
+
+Esses modelos são consumidos pela aplicação para gerar as respostas e para converter texto em vetores num espaço semântico. Garante-se assim que o RAG consiga comparar com precisão a similaridade entre perguntas e trechos de texto.
+
+## Streamlit
+Streamlit é um framework para criar aplicações web em Python de forma rápida. Aqui, `app_streamlit.py` fornece interface visual, histórico de chat e botão de envio, enquanto `main.py` mantém o fluxo de terminal.
+
+A vantagem do Streamlit é que ele abstrai HTML/CSS/JS e permite renderizar componentes interativos diretamente de scripts Python. Isso reduz radicalmente o tempo de desenvolvimento, ideal para POCs e demos como esta.
 
 ## Arquitetura
 
@@ -81,9 +76,14 @@ O diagrama reflete o fluxo atualizado da arquitetura RAG com guardrails e re-ran
 - saída do modelo passa por `Output Guardrail` (validações de contexto e saída)
 - `Resposta` final é retornada ao usuário
 
-Essa atualização torna explícito o pipeline de segurança e qualidade que você implementou: filtragem antes e depois do LLM, e reavaliação dos chunks retornados para reduzir falsos positivos e alucinações.
+Essa atualização torna explícito o pipeline de segurança e qualidade implementado: filtragem antes e depois do LLM, e reavaliação dos chunks retornados para reduzir falsos positivos e alucinações.
 
 ## Como Executar
+
+### Iniciar Qdrant (Docker)
+```bash
+docker run -p 6333:6333 qdrant/qdrant
+```
 
 ### Configuração do Ambiente Virtual
 
