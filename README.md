@@ -1,5 +1,11 @@
 # POC LLM + RAG
 
+## Instalação e Execução
+1. Instale as dependências: `pip install -r requirements.txt`
+2. Configure o Qdrant: `docker run -p 6333:6333 qdrant/qdrant` (para persistência do índice)
+3. Configure variáveis de ambiente: crie um `.env` com `OPENAI_API_KEY=your_key`
+4. Execute o chat: `python main.py` ou a interface web: `streamlit run app_streamlit.py`
+
 ## Como Funciona o RAG
 No RAG, tudo começa com a leitura da sua base de conhecimento (ex: dados.txt). Esse conteúdo é dividido em pedaços menores (chunks), para facilitar o processamento. Em seguida, cada pedaço é transformado em um vetor numérico usando embeddings — basicamente, o texto vira uma representação matemática que captura o significado dele.
 
@@ -29,6 +35,13 @@ Guardrails são mecanismos de segurança e controle que validam inputs do usuár
 Re-ranking é uma técnica de segunda etapa que melhora a qualidade dos resultados de busca. Após a busca inicial por similaridade de embeddings (que retorna os top 10 chunks), usamos um cross-encoder (`sentence-transformers`) para reavaliar e reordenar esses resultados baseado em relevância contextual mais precisa. Isso reduz falsos positivos e garante que apenas os 3 chunks mais relevantes sejam enviados para o LLM, melhorando significativamente a qualidade das respostas.
 
 A implementação está em `rag_service.py` e usa o modelo leve `cross-encoder/ms-marco-MiniLM-L-6-v2` para manter a simplicidade e performance.
+
+## Qdrant (Persistência do Índice)
+Qdrant é um banco de dados vetorial usado para armazenar e recuperar embeddings de forma eficiente. Na POC, ele persiste o índice de vetores, evitando recriação a cada execução e melhorando a performance.
+
+Para rodar: `docker run -p 6333:6333 qdrant/qdrant`
+
+O índice é salvo automaticamente na coleção "rag_collection" no Qdrant.
 
 ## Arquitetura
 

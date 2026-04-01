@@ -1,7 +1,9 @@
-from llama_index.core import VectorStoreIndex, Document, Settings
+from llama_index.core import VectorStoreIndex, Document, Settings, StorageContext
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SimpleNodeParser
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
 from sentence_transformers import CrossEncoder
 
 
@@ -32,8 +34,17 @@ class RagService:
         documents = [Document(text=content)]
         nodes = node_parser.get_nodes_from_documents(documents)
 
-        # Cria o índice de vetor (VectorStoreIndex) a partir dos nós.
-        index = VectorStoreIndex(nodes)
+        # Conecta ao Qdrant (rodando no Docker)
+        client = QdrantClient(host="localhost", port=6333)
+        vector_store = QdrantVectorStore(client=client, collection_name="rag_collection")
+        storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
+        if client.collection_exists("rag_collection"):
+            # Carrega índice existente
+            index = VectorStoreIndex.from_vector_store(vector_store, storage_context=storage_context)
+        else:
+            # Cria novo índice
+            index = VectorStoreIndex(nodes, storage_context=storage_context)
 
         # Cria o mecanismo de consulta (query engine) usando similaridade para retornar hits relevantes.
         # similarity_top_k=10 indica os 10 documentos mais similares para cada consulta (antes do re-ranking).
