@@ -3,6 +3,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.vector_stores.qdrant import QdrantVectorStore
+from llama_index.core.response_synthesizers import get_response_synthesizer
 from qdrant_client import QdrantClient
 from sentence_transformers import CrossEncoder
 
@@ -50,34 +51,33 @@ class RagService:
         # similarity_top_k=10 indica os 10 documentos mais similares para cada consulta (antes do re-ranking).
         self.query_engine = index.as_query_engine(similarity_top_k=10)
         
+        # Cria um retriever para recuperar 10 nodes antes do re-ranking
+        self.retriever = index.as_retriever(similarity_top_k=10)
+        
         # Inicializa o cross-encoder para re-ranking
         self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+        
+        # Inicializa o sintetizador de respostas
+        self.response_synthesizer = get_response_synthesizer()
 
     def query(self, query: str):
-        # Executa a consulta inicial no mecanismo de RAG
-        initial_response = self.query_engine.query(query)
+        # RETRIEVAL: Recupera os 10 chunks mais similares usando similarity search
+        retrieved_nodes = self.retriever.retrieve(query)
         
-        # Se não há source_nodes, retorna resposta vazia
-        if not initial_response.source_nodes:
-            return initial_response
+        if not retrieved_nodes:
+            return None
         
-        # Extrai textos dos nodes para re-ranking
-        node_texts = [node.text for node in initial_response.source_nodes]
-        
-        # Cria pares (query, text) para o cross-encoder
+        # RE-RANKING: Usa cross-encoder para reranquear os 10 chunks
+        node_texts = [node.text for node in retrieved_nodes]
         query_text_pairs = [[query, text] for text in node_texts]
-        
-        # Calcula scores de relevância com cross-encoder
         scores = self.cross_encoder.predict(query_text_pairs)
         
-        # Ordena nodes por score (decrescente)
-        scored_nodes = list(zip(scores, initial_response.source_nodes))
+        # SELEÇÃO: Ordena os nodes pelos scores e seleciona os top 3
+        scored_nodes = list(zip(scores, retrieved_nodes))
         scored_nodes.sort(key=lambda x: x[0], reverse=True)
-        
-        # Seleciona apenas os top 3 mais relevantes após re-ranking
         top_nodes = [node for score, node in scored_nodes[:3]]
         
-        # Atualiza a resposta com os nodes re-rankados
-        initial_response.source_nodes = top_nodes
+        # GENERATION: Passa apenas os 3 chunks mais relevantes para o LLM gerar a resposta
+        response = self.response_synthesizer.synthesize(query, nodes=top_nodes)
         
-        return initial_response
+        return response
