@@ -48,6 +48,15 @@ Isso significa que o envio de email é uma **capacidade decidida pelo LLM** em l
 ## Envio de Email
 O envio é acionado pelo LLM quando o usuário pede explicitamente durante a conversa. As credenciais são lidas das variáveis de ambiente.
 
+## Avaliação do Pipeline RAG (RAGAS)
+RAGAS é uma biblioteca que avalia a qualidade do pipeline RAG com métricas objetivas, sem precisar de anotações manuais extensas. Na POC, `rag/eval_service.py` roda um conjunto de perguntas contra o RAG e mede três aspectos:
+
+- **faithfulness** — a resposta está ancorada nos chunks recuperados? (detecta alucinação)
+- **answer_relevancy** — a resposta é relevante para a pergunta feita?
+- **context_precision** — os chunks recuperados são realmente úteis para responder?
+
+Os scores variam de 0 a 1 (quanto maior, melhor). O RAGAS usa `gpt-4o-mini` internamente para avaliar, garantindo contexto suficiente para análises mais longas. 
+
 ## Streamlit
 Streamlit é um framework para criar aplicações web em Python de forma rápida. Aqui, `app_streamlit.py` fornece interface visual, histórico de chat e botão de envio, enquanto `main.py` mantém o fluxo de terminal.
 
@@ -141,6 +150,13 @@ streamlit run app_streamlit.py
 ```
 
 O navegador abrirá automaticamente em `http://localhost:8501` com uma interface amigável para interagir com o chatbot.
+
+### Opção 3: Avaliação do Pipeline
+```bash
+python eval.py
+```
+
+Roda o RAGAS sobre um conjunto de perguntas de teste e imprime os scores de `faithfulness`, `answer_relevancy` e `context_precision`.
 
 ### Troubleshooting
 
