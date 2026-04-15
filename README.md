@@ -33,6 +33,21 @@ OpenAI fornece o modelo de linguagem (`gpt-5`) e embeddings usados no projeto. E
 
 Esses modelos são consumidos pela aplicação para gerar as respostas e para converter texto em vetores num espaço semântico. Garante-se assim que o RAG consiga comparar com precisão a similaridade entre perguntas e trechos de texto.
 
+## MCP (Model Context Protocol)
+MCP é um protocolo aberto criado pela Anthropic que padroniza a forma como modelos de linguagem se comunicam com ferramentas externas. Em vez de cada integração ter sua própria API customizada, o MCP define um contrato único: o servidor expõe ferramentas (tools) com nome, descrição e schema de entrada; o agente LLM descobre essas ferramentas em tempo de execução e as invoca quando necessário.
+
+Na POC, `email_service.py` implementa um servidor MCP que expõe a ferramenta `send_email`. O fluxo funciona assim:
+
+1. O usuário pede naturalmente durante a conversa: *"me manda um resumo no email fulano@gmail.com"*
+2. O LLM (gpt-4o) detecta a intenção e resolve os argumentos `to`, `subject` e `body`
+3. O `ChatApp` inicia o `email_service.py` como subprocesso via protocolo MCP (stdio)
+4. O servidor MCP executa o envio SMTP e retorna a confirmação
+
+Isso significa que o envio de email é uma **capacidade decidida pelo LLM** em linguagem natural, sem comandos especiais ou prompts fixos no código.
+
+## Envio de Email
+O envio é acionado pelo LLM quando o usuário pede explicitamente durante a conversa. As credenciais são lidas das variáveis de ambiente.
+
 ## Streamlit
 Streamlit é um framework para criar aplicações web em Python de forma rápida. Aqui, `app_streamlit.py` fornece interface visual, histórico de chat e botão de envio, enquanto `main.py` mantém o fluxo de terminal.
 
@@ -106,9 +121,13 @@ pip install -r requirements.txt
 
 ### Configuração da API Key
 1. Copie o arquivo de exemplo: `cp .env.example .env`
-2. Edite o arquivo `.env` com sua chave da API do OpenAI:
+2. Edite o arquivo `.env` com suas chaves:
 ```
 OPENAI_API_KEY=sua_chave_aqui
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=seu_email@gmail.com
+SMTP_PASSWORD=sua_senha_de_app
 ```
 
 ### Opção 1: Chat pelo Terminal
