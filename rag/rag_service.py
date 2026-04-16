@@ -27,7 +27,7 @@ class RagService:
         # chunk_size = tamanho aproximado de cada pedaço em tokens/caracteres;
         # chunk_overlap = quanto os pedaços podem se sobrepor para manter contexto.
         node_parser = SimpleNodeParser.from_defaults(
-            chunk_size=500,
+            chunk_size=300,
             chunk_overlap=100
         )
 
