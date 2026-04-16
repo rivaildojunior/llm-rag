@@ -6,7 +6,34 @@ No RAG, tudo começa com a leitura da sua base de conhecimento (ex: dados.txt). 
 Esses vetores são armazenados em um índice vetorial. Quando o usuário faz uma pergunta, essa pergunta também é transformada em vetor, e o sistema busca no índice os pedaços mais parecidos (mais relevantes semanticamente). Ou seja, ele não procura por palavras iguais, mas por significado parecido.
 
 Por fim, os trechos encontrados são enviados junto com a pergunta para o modelo de linguagem. A LLM usa esse contexto como base para gerar a resposta, evitando “inventar” informações e respondendo com base no conteúdo recuperado.
+## Roteamento de Consultas (RAG + PostgreSQL)
+A POC combina duas fontes de dados para responder perguntas:
 
+- **`dados.txt` (RAG vetorial)** — perguntas sobre políticas da loja, trocas, devoluções, frete e reembolsos são respondidas via busca semântica no Qdrant.
+- **PostgreSQL (dados estruturados)** — perguntas sobre pedidos e status de entrega são roteadas para o banco de dados relacional.
+
+O roteamento é feito em `rag_service.py` com base em palavras-chave no input do usuário. Quando identificada uma pergunta sobre pedidos, o `DbService` converte a pergunta em SQL via LLM, executa no banco e devolve a resposta em linguagem natural.
+
+```
+Pergunta do usuário
+        │
+        ▼
+  Contém palavras-chave
+  de pedido/status?
+     │         │
+    Sim        Não
+     │         │
+     ▼         ▼
+PostgreSQL   Qdrant (RAG)
+     │         │
+     └────┬────┘
+          ▼
+    Resposta natural (LLM)
+```
+
+Para rodar: `docker run -d --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres`
+
+As credenciais são lidas das variáveis de ambiente definidas no `.env`.
 ## LlamaIndex
 LlamaIndex é uma biblioteca que facilita a criação de pipelines RAG completos. Na POC, usamos `VectorStoreIndex` com `QdrantVectorStore` para indexar documentos com embeddings e `index.as_query_engine()` para fazer buscas semânticas com alto desempenho.
 

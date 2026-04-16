@@ -6,6 +6,7 @@ from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core.response_synthesizers import get_response_synthesizer
 from qdrant_client import QdrantClient
 from sentence_transformers import CrossEncoder
+from rag.db_service import DbService
 
 
 class RagService:
@@ -60,7 +61,16 @@ class RagService:
         # Inicializa o sintetizador de respostas
         self.response_synthesizer = get_response_synthesizer()
 
-    def query(self, query: str):
+        # Palavras-chave que indicam perguntas sobre dados estruturados do banco
+        self._db_keywords = ["pedido", "order", "status", "entregue", "enviado", "pendente", "cliente"]
+        self.db_service = DbService()
+
+    def query(self, query: str, user_input: str = None):
+        # Roteamento baseado apenas no input original do usuário, não no prompt completo com histórico
+        routing_text = (user_input or query).lower()
+        if any(kw in routing_text for kw in self._db_keywords):
+            return self.db_service.query(user_input or query)
+
         # RETRIEVAL: Recupera os 10 chunks mais similares usando similarity search
         retrieved_nodes = self.retriever.retrieve(query)
         

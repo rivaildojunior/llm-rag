@@ -153,15 +153,17 @@ class ChatApp:
             {user_input}
             """
 
-            response = self.rag.query(query)
+            response = self.rag.query(query, user_input=user_input)
 
-            # Validar resposta
-            is_response_valid, warning_msg = self.guardrails.validate_response(response)
-            
-            if response.source_nodes and is_response_valid:
-                answer = response.response
+            # Respostas do DbService chegam como string; respostas RAG como objeto LlamaIndex
+            if isinstance(response, str):
+                answer = response
             else:
-                answer = warning_msg if warning_msg else "Não sei."
+                is_response_valid, warning_msg = self.guardrails.validate_response(response)
+                if response.source_nodes and is_response_valid:
+                    answer = response.response
+                else:
+                    answer = warning_msg if warning_msg else "Não sei."
 
             print("🤖 Assistente: ", end="")
             for char in answer:

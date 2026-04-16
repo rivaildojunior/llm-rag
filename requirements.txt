@@ -9,3 +9,4 @@ sentence-transformers
 qdrant-client
 mcp
 ragas
+psycopg2-binary
