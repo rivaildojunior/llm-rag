@@ -17,8 +17,9 @@ DB_CONFIG = {
 # Schema das tabelas disponíveis para o LLM gerar SQL
 DB_SCHEMA = """
 Tabela: orders
-Colunas: id (integer), customer_name (text), status (text)
+Colunas: id (integer), order_number (text), customer_name (text), status (text)
 Valores possíveis de status: PENDENTE, ENVIADO, ENTREGUE
+Regra: Para consultas de status de pedido, filtre SEMPRE pela coluna order_number, nunca por customer_name.
 """
 
 
@@ -33,7 +34,8 @@ class DbService:
     def _generate_sql(self, query: str) -> str:
         prompt = f"""Você é um assistente que converte perguntas em SQL para PostgreSQL.
                     Use apenas a tabela descrita abaixo. Retorne SOMENTE o SQL, sem explicações, sem markdown.
-                    Para comparações de texto (nomes, status), use sempre ILIKE para ignorar maiúsculas/minúsculas.
+                    Para comparações de texto (status, order_number), use sempre ILIKE para ignorar maiúsculas/minúsculas.
+                    Para consultas de status de pedido, filtre SEMPRE pela coluna order_number, nunca por customer_name.
 
                     Schema:
                     {DB_SCHEMA}
