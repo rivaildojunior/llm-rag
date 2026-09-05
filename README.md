@@ -109,12 +109,12 @@ graph LR
     K --> L((Resposta))
 
     %% Estilização simples e elegante
-    style C fill:#fef3c7,stroke:#d97706,stroke-width:2px
-    style L fill:#dcfce7,stroke:#16a34a,stroke-width:2px
-    style G fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-    style H fill:#dbeafe,stroke:#2563eb,stroke-width:2px
-    style E fill:#fde68a,stroke:#d97706,stroke-width:2px
-    style K fill:#fde68a,stroke:#d97706,stroke-width:2px
+    style C fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#000000
+    style L fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#000000
+    style G fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#000000
+    style H fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#000000
+    style E fill:#fde68a,stroke:#d97706,stroke-width:2px,color:#000000
+    style K fill:#fde68a,stroke:#d97706,stroke-width:2px,color:#000000
 ```
 
 O diagrama reflete o fluxo atualizado da arquitetura RAG com guardrails e re-ranking:
