@@ -27,3 +27,6 @@ Thumbs.db
 
 # Text files
 backlog.txt
+
+# Dados locais do Qdrant embutido
+rag/qdrant_data/

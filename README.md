@@ -94,7 +94,7 @@ A vantagem do Streamlit é que ele abstrai HTML/CSS/JS e permite renderizar comp
 ```mermaid
 graph LR
     %% Nós principais
-    A[Base de Dados] --> B(Embeddings)
+    A[Dados.txt] --> B(Embeddings)
     B --> C[(Vetor DB)]
 
     D[Pergunta] --> E[Input Guardrail]
@@ -119,7 +119,7 @@ graph LR
 
 O diagrama reflete o fluxo atualizado da arquitetura RAG com guardrails e re-ranking:
 
-- `Base de Dados` → `Embeddings` → `Vetor DB`
+- `Dados.txt` → `Embeddings` → `Vetor DB`
 - `Pergunta` passa por `Input Guardrail` (validações de entrada)
 - Conversão de pergunta para embedding e busca semântica no vetor
 - resultados de busca são reordenados em `Re-ranking`

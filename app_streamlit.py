@@ -12,6 +12,10 @@ from rag.guardrails_service import GuardrailsService
 
 load_dotenv()
 
+# Palavras-chave que indicam possível pedido de envio de email. Só chamamos o LLM
+# para checar a tool quando alguma delas aparece, evitando uma chamada extra em toda pergunta.
+_EMAIL_KEYWORDS = ["email", "e-mail", "enviar", "mandar", "encaminhar"]
+
 # Mesma tool de email exposta no chat de terminal (rag/chat_app.py), para manter os dois fluxos equivalentes.
 _EMAIL_TOOL = {
     "type": "function",
@@ -126,7 +130,7 @@ with chat_container:
             # Exibir resposta do assistente com efeito de digitação apenas para a última mensagem (uma única vez)
             is_last_message = i == len(st.session_state.memory.chat_history) - 1
             should_animate = is_last_message and st.session_state.last_animated_message_count < len(st.session_state.memory.chat_history)
-            
+
             if should_animate:
                 # Última mensagem nova - mostrar com efeito de digitação
                 response_placeholder = st.empty()
@@ -157,11 +161,14 @@ if submit_button and user_input:
         st.session_state.last_processed_input = user_input
 
         # Verifica se o usuário pediu envio de email antes de processar a pergunta normalmente,
-        # mesmo fluxo usado no chat de terminal (rag/chat_app.py).
-        with st.spinner("🔄 Processando sua pergunta..."):
-            tool_response = _try_tool_call(
-                st.session_state.openai_client, user_input, st.session_state.memory.chat_history
-            )
+        # mesmo fluxo usado no chat de terminal (rag/chat_app.py). Só consulta o LLM quando o
+        # input sugere isso, para não pagar uma chamada extra em toda pergunta.
+        tool_response = None
+        if any(kw in user_input.lower() for kw in _EMAIL_KEYWORDS):
+            with st.spinner("🔄 Processando sua pergunta..."):
+                tool_response = _try_tool_call(
+                    st.session_state.openai_client, user_input, st.session_state.memory.chat_history
+                )
 
         if tool_response:
             st.session_state.memory.add("user", user_input)

@@ -146,6 +146,93 @@ A loja utiliza criptografia para proteger os dados dos clientes.
 As informações:
 - Não são compartilhadas com terceiros
 - São usadas apenas para processamento de pedidos
+- São tratadas de acordo com a Lei Geral de Proteção de Dados (LGPD)
+
+---
+
+[TÍTULO: Formas de pagamento aceitas]
+
+A NovaShop aceita os seguintes meios de pagamento:
+- Cartão de crédito (Visa, Mastercard, Elo e American Express)
+- Cartão de débito
+- Boleto bancário
+- PIX
+- Vale-presente NovaShop
+
+---
+
+[TÍTULO: Parcelamento no cartão de crédito]
+
+Compras no cartão de crédito podem ser parceladas em até 12 vezes.
+- Parcelamento em até 3 vezes: sem juros
+- A partir da 4ª parcela: incide juros conforme taxa informada no checkout
+
+---
+
+[TÍTULO: Nota fiscal]
+
+Toda compra realizada na NovaShop gera nota fiscal eletrônica (NF-e), enviada por e-mail após a confirmação do pagamento.
+- A nota fiscal também fica disponível na área "Meus Pedidos"
+- Para compras com CNPJ, é possível informar os dados da empresa no checkout
+
+---
+
+[TÍTULO: Garantia do fabricante e garantia legal]
+
+Produtos eletrônicos possuem garantia do fabricante, que varia conforme o item (geralmente 12 meses).
+- Essa garantia é além da garantia legal de 90 dias prevista no Código de Defesa do Consumidor
+- Defeitos cobertos pela garantia do fabricante devem ser tratados diretamente pela assistência técnica autorizada indicada no manual do produto
+
+---
+
+[TÍTULO: Assistência técnica autorizada]
+
+Para produtos fora do prazo de troca da loja, mas ainda dentro da garantia do fabricante:
+- O cliente deve procurar uma assistência técnica autorizada da marca
+- A lista de assistências autorizadas costuma constar no manual do produto ou no site do fabricante
+
+---
+
+[TÍTULO: Rastreamento de pedidos]
+
+O cliente pode acompanhar o status do pedido em tempo real:
+1. Acessar a área "Meus Pedidos"
+2. Selecionar o pedido desejado
+3. Visualizar o código de rastreio e o status atualizado da transportadora
+
+---
+
+[TÍTULO: Alteração de endereço de entrega]
+
+A alteração do endereço de entrega só é possível:
+- Antes do pedido ser despachado para a transportadora
+- Através do canal de atendimento ao cliente
+
+Após o despacho, não é possível alterar o endereço; nesse caso, o cliente deve recusar o recebimento e solicitar um novo envio.
+
+---
+
+[TÍTULO: Produtos não elegíveis para devolução por arrependimento]
+
+Por questões de higiene e segurança, não são aceitos para devolução por arrependimento (exceto em caso de defeito):
+- Fones de ouvido intra-auriculares com lacre rompido
+- Produtos personalizados ou gravados sob encomenda
+
+---
+
+[TÍTULO: Cupons de desconto e programa de fidelidade]
+
+A NovaShop possui um programa de fidelidade chamado "NovaShop Pontos":
+- O cliente acumula pontos a cada compra, que podem ser trocados por cupons de desconto
+- Cupons promocionais divulgados por e-mail ou redes sociais têm validade e regras específicas informadas no momento do cadastro
+
+---
+
+[TÍTULO: Disponibilidade de estoque e pré-venda]
+
+Quando um produto está esgotado:
+- O cliente pode ativar o "Avise-me" para ser notificado por e-mail quando o item voltar ao estoque
+- Produtos em pré-venda exibem a data estimada de envio na própria página do produto
 
 ---
 
